@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+	<head>
+		<meta charset="UTF-8">
+		<title>machine</title>
+		<link rel="icon" type="image/png" href="Image/icon.png">
+		<link rel="stylesheet" href="MachineStyle.css">
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<style>
+		</style>
+	</head>
+	
+	<body>
+		<h1 class="text shadow"
+			style="	text-transform: uppercase;
+					font-size: clamp(10px, 5vw, 60px);
+					">
+			Üdvözöllek a motor irányító központban
+		</h1>
+		<div class="middle">
+			<p class="text textborder text-box">Imáid továbbítva lettek,<br>de ez még nem jelent semmit!</p>
+		</div>
+		
+		<div style="display: flex;
+					justify-content: space-between;		
+					margin-top: 50px;
+					
+					height: 500px;
+					max-height: 100vh;">
+			<div 	style="	width:49%;
+							margin: 10px;
+							display: flex;
+							justify-content: space-between;"
+					class="div-background">
+						<button class="buttonBig"
+								style="	flex:0.45;
+										"
+								onclick="ledOn()"
+									>Turn<br>ON LED
+						</button>
+						<button class="buttonBig"
+								style="	flex:0.45;
+										"
+								onclick="ledOff()"
+									>Turn<br>OFF LED
+						</button>
+			</div>
+			<div 	style="	width:49%;
+							margin: 10px;"
+					class="div-background">
+				<canvas id="MyChart" 
+						heigth="1000" 
+						width="1000"
+						style="	width: 100%;
+								height: 100%;
+								max-height: 100vh;
+								"
+							>
+				</canvas>
+			</div>
+		</div>
+		
+		
+		
+		<!-- 
+		<script>
+		  async function ledOn() {
+			let bodyjson = "{\"code\":\"107\"}";
+			let url = "/ledOn";
+
+			let response = await fetch(url, {
+			  method: 'POST',
+			  body: bodyjson,
+			  headers: {
+				'Access-Control-Allow-Headers': '*',
+				'Access-Control-Allow-Origin': '*',
+				'Content-type': 'application/json; charset=UTF-8'
+			  }
+			}).catch(err => { alert(err); });
+
+			let ret = await response.text();
+			let ret_json = JSON.parse(ret);
+
+			if (ret_json['success'] === 1)
+			  document.getElementById("feedback").value = "LED has been turned ON";
+			else
+			  document.getElementById("feedback").value = "LED is already turned ON";
+		  }
+		  async function ledOff() {
+			let bodyjson = "{\"code\":\"105\"}";
+			let url = "/ledOn";
+
+			let response = await fetch(url, {
+			  method: 'POST',
+			  body: bodyjson,
+			  headers: {
+				'Access-Control-Allow-Headers': '*',
+				'Access-Control-Allow-Origin': '*',
+				'Content-type': 'application/json; charset=UTF-8'
+			  }
+			}).catch(err => { alert(err); });
+
+			let ret = await response.text();
+			let ret_json = JSON.parse(ret);
+
+			if (ret_json['success'] === 1)
+			  document.getElementById("feedback").value = "LED has been turned OFF";
+			else
+			  document.getElementById("feedback").value = "LED is already turned OFF";
+		  }
+		  async function getAdc() {
+		  url = "http://192.168.10.222/getAdc";
+		  let response = await fetch(url).catch(err =>
+		  { alert(err); })
+		  let text = await response.text();
+		  let adcval = JSON.parse(text)
+		  document.getElementById("state").value =
+		  adcval['value'];
+		  
+		  // Hozzáadjuk az új értéket a charthoz
+			const now = new Date().toLocaleTimeString();
+			adcChart.data.labels.push(now);
+			adcChart.data.datasets[0].data.push(adcval['value']);
+
+			// Ha túl sok adat van, törlünk a legelejéről
+			if (adcChart.data.labels.length > 20) {
+			  adcChart.data.labels.shift();
+			  adcChart.data.datasets[0].data.shift();
+			}
+
+			adcChart.update();
+		  
+		  
+		  
+		  }
+		
+		
+			// Chart inicializálása
+			const ctx = document.getElementById('adcChart').getContext('2d');
+			const adcChart = new Chart(ctx, {
+			  type: 'line',
+			  data: {
+				labels: [],
+				datasets: [{
+				  label: 'ADC Value',
+				  data: [],
+				  borderWidth: 1,
+				  borderColor: 'rgba(75, 192, 192, 1)',
+				  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+				  tension: 0.3
+				}]
+			  },
+			  options: {
+				responsive: true,
+				animation: false,
+				scales: {
+				  y: {
+					beginAtZero: true,
+					max: 4095
+				  }
+				}
+			  }
+			});
+		
+		
+			
+			
+			
+		setInterval(getAdc, 1000);
+	</script>
+		-->
+		
+		<script> 
+			
+			// Chart inicializálása
+			const chartVar = document.getElementById('MyChart').getContext('2d');
+			const motorChart = new Chart(chartVar, {
+			  type: 'scatter',
+			  data: {
+				labels: [],
+				datasets: [{
+				  label: 'Motor position',
+				  data: [],
+				  borderColor: 'rgba(96, 0, 0, 1)',
+				  backgroundColor: 'rgba(144, 0, 0, 1)'
+				}]
+			  },
+			  options: {
+				responsive: true,
+				animation: false,
+				scales: {
+				  y: {
+					beginAtZero: true,
+					max: 4095,
+				  }
+				}
+			  }
+			});
+		</script>
+		
+	</body>
+</html>
