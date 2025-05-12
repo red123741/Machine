@@ -50,6 +50,7 @@
 				<canvas id="MyChart" 
 						heigth="1000" 
 						width="1000"
+						class="chartMachine"
 						style="	width: 100%;
 								height: 100%;
 								max-height: 100vh;
@@ -61,19 +62,26 @@
 		
 		
 		
-		<!-- 
+		
 		<script>
-		  async function ledOn() {
-			let bodyjson = "{\"code\":\"107\"}";
-			let url = "/ledOn";
+		  //Először is hadd kezdjem azzal, hogy mi az, hogy nem kell megadni változónak a típusát?! Mi az hogy dinamikusan adja meg a típusát programfutása közben?!
+		  let ip = window.location.hostname; //A böngésződben megnyitott ablak url címéből kiszedi az IP cím részt, amelyet később felhasználhatsz.
+		  console.log("Az esp32 IP-címe:", ip); //Kírja a konzolba, amelyet F12-vel tudsz elérni.
+		  
+		  async function ledOn() { //Ha ez megvan akkor a ledOff-ot nem is kell majd részletezni.
+			let bodyjson = "{\"code\":\"107\"}"; //Létrehoz egy JSON objektumot "code" kulcsszóval és 107-es értéket rendel hozzá.
+			let url = "/ledOn"; //Létrehoz egy stringet "/ledOn" névvel, amely majd a végpont lesz.
 
-			let response = await fetch(url, {
-			  method: 'POST',
-			  body: bodyjson,
+			let response = await fetch(url, { //Létrehoz egy response-t, amely a fetch értékét fogja tárolni. Az await-el a kód addig meg áll és nem megy tovább, amíg a fetch be nem fejeződik.
+			  //Mi is ez a fetch? 
+			  
+			  //A fetch itt lesz konfigurálva
+			  method: 'POST', //Megadja a HTTP metódust. POST - azaz innen küldünk ki értéket.
+			  body: bodyjson, //A küldeni kívánt változó neve. 
 			  headers: {
 				'Access-Control-Allow-Headers': '*',
 				'Access-Control-Allow-Origin': '*',
-				'Content-type': 'application/json; charset=UTF-8'
+				'Content-type': 'application/json; charset=UTF-8' //Innen fogja tudni a szerver, hogy JSON formátumban akarunk küldeni adatot.
 			  }
 			}).catch(err => { alert(err); });
 
@@ -108,7 +116,7 @@
 			  document.getElementById("feedback").value = "LED is already turned OFF";
 		  }
 		  async function getAdc() {
-		  url = "http://192.168.10.222/getAdc";
+		  url = ip + "/getAdc";
 		  let response = await fetch(url).catch(err =>
 		  { alert(err); })
 		  let text = await response.text();
@@ -132,70 +140,49 @@
 		  
 		  
 		  }
-		
-		
-			// Chart inicializálása
-			const ctx = document.getElementById('adcChart').getContext('2d');
-			const adcChart = new Chart(ctx, {
-			  type: 'line',
-			  data: {
-				labels: [],
-				datasets: [{
-				  label: 'ADC Value',
-				  data: [],
-				  borderWidth: 1,
-				  borderColor: 'rgba(75, 192, 192, 1)',
-				  backgroundColor: 'rgba(75, 192, 192, 0.2)',
-				  tension: 0.3
-				}]
-			  },
-			  options: {
-				responsive: true,
-				animation: false,
-				scales: {
-				  y: {
-					beginAtZero: true,
-					max: 4095
-				  }
-				}
-			  }
-			});
-		
-		
-			
-			
-			
-		setInterval(getAdc, 1000);
-	</script>
-		-->
-		
-		<script> 
 			
 			// Chart inicializálása
 			const chartVar = document.getElementById('MyChart').getContext('2d');
 			const motorChart = new Chart(chartVar, {
-			  type: 'scatter',
+			  type: 'line',
 			  data: {
-				labels: [],
+				labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
 				datasets: [{
 				  label: 'Motor position',
-				  data: [],
+				  data: [500, 750, 1000, 1250, 1500, 2000, 3000, 3500, 3750, 4000],
 				  borderColor: 'rgba(96, 0, 0, 1)',
-				  backgroundColor: 'rgba(144, 0, 0, 1)'
+				  backgroundColor: 'rgba(144, 0, 0, 1)',
+				  fill: false,
+				  tension: 0,
 				}]
 			  },
 			  options: {
 				responsive: true,
 				animation: false,
 				scales: {
+				  x: {
+					type: 'category',
+					title: {
+					  display: true,
+					  text: 'eltelt idő',
+					},
+					grid: {
+					  display: true,
+					},
+				  },
 				  y: {
 					beginAtZero: true,
-					max: 4095,
-				  }
-				}
+					title: {
+					  display: true,
+					  text: 'pozíció érték',
+					},
+				  },
+				},
 			  }
-			});
-		</script>
+			});		
+			
+		//setInterval(getAdc, 1000);
+	</script>
 		
 	</body>
 </html>
