@@ -72,9 +72,10 @@
 			let bodyjson = "{\"code\":\"107\"}"; //Létrehoz egy JSON objektumot "code" kulcsszóval és 107-es értéket rendel hozzá.
 			let url = "/ledOn"; //Létrehoz egy stringet "/ledOn" névvel, amely majd a végpont lesz.
 
-			let response = await fetch(url, { //Létrehoz egy response-t, amely a fetch értékét fogja tárolni. Az await-el a kód addig meg áll és nem megy tovább, amíg a fetch be nem fejeződik.
-			  //Mi is ez a fetch? 
-			  
+			let responseStored = await fetch(url, { //Létrehoz egy response-t, amely a fetch response válaszát fogja tárolni. Amíg még nem érkezik válasz addig a fetch promise objektumot ad vissza, de az await segítségével megvárjuk, hogy befejezze a dolgát és így a végén már a fetch Response-t objektumot ad vissza.
+			  //Mi az a promise? A promise egy olyan objektum, amely visszaadja az adott dolognak az állapotát. 3 állapota lehet: pending (azaz még tart a folyamat), fulfilled (sikeresen megtörtént), rejected (hibára futott). Ez már egy komplexebb verziója annak amit a arduinos programokban láthattunk ahol csak egy bool értéket ad vissza.
+			  //Mivel a fetch egy aszinkron folyamat, azaz nem a megszokott arduinos formátumú, hogy ha megvan hívva egy függvény, akkor az végig fut és utána megy tovább a program, hanem meghívása után fut tovább a program. Hogy bevárjuk ezt a függvényt ezért egy await-et teszünk elé, amely addig megállítja a programot amíg benem fejezi.
+			  //Mi is ez a fetch? Ez egy javaScriptes HTTP-hez használt függvény, amely a megadott url-re egy HTTP_POST-ot ad ki és az alábbiakban megadott bodyjson változót rakja bele. Ha kíváncsi vagy és meg akarod nézni akkor írd az IP cím után a /ledOn-t pl. https://192.168.144.42/ledOn és akkor látni fogod a bodyjson értékét.
 			  //A fetch itt lesz konfigurálva
 			  method: 'POST', //Megadja a HTTP metódust. POST - azaz innen küldünk ki értéket.
 			  body: bodyjson, //A küldeni kívánt változó neve. 
@@ -83,21 +84,23 @@
 				'Access-Control-Allow-Origin': '*',
 				'Content-type': 'application/json; charset=UTF-8' //Innen fogja tudni a szerver, hogy JSON formátumban akarunk küldeni adatot.
 			  }
-			}).catch(err => { alert(err); });
+			}).catch(err => { alert(err); }); //A .catch azért felel, hogyha a promise objektumunk azaz jelen esetben a fetch rejected-et dob vissza akkor ez a rész fusson le. Itt csak kiírat egy error üzenetet.
 
-			let ret = await response.text();
-			let ret_json = JSON.parse(ret);
+			let ret = await responseStored.text(); //Ismételten aszinkron folyamat, ezért await. A .text() segítségével kiolvassuk a body részét a kapott response-nak és elmenti a ret változóba egy string-ként.
+			let ret_json = JSON.parse(ret); //Itt JSON.parse(ret)-el átkonvertáljuk JSON formátumúvá a string-et. parse - feldolgozást jelent.
 
-			if (ret_json['success'] === 1)
+			if (ret_json['success'] === 1) //Mivel itt az esp oldalról már csak a success-t küldtük vissza így ennek értékét tudjuk leellenőrizni.
+			  //végre egy ismerős if szerkezet. -/\-
 			  document.getElementById("feedback").value = "LED has been turned ON";
 			else
 			  document.getElementById("feedback").value = "LED is already turned ON";
-		  }
-		  async function ledOff() {
+		  }//ledOn() END
+		  
+		  async function ledOff() { //Ha megértetted az előzőt akkor megfejtheted magadtól a most következőt.
 			let bodyjson = "{\"code\":\"105\"}";
 			let url = "/ledOn";
 
-			let response = await fetch(url, {
+			let responseStored = await fetch(url, {
 			  method: 'POST',
 			  body: bodyjson,
 			  headers: {
@@ -107,39 +110,35 @@
 			  }
 			}).catch(err => { alert(err); });
 
-			let ret = await response.text();
+			let ret = await responseStored.text();
 			let ret_json = JSON.parse(ret);
 
 			if (ret_json['success'] === 1)
 			  document.getElementById("feedback").value = "LED has been turned OFF";
 			else
 			  document.getElementById("feedback").value = "LED is already turned OFF";
-		  }
-		  async function getAdc() {
-		  url = ip + "/getAdc";
-		  let response = await fetch(url).catch(err =>
-		  { alert(err); })
-		  let text = await response.text();
-		  let adcval = JSON.parse(text)
-		  document.getElementById("state").value =
-		  adcval['value'];
+		  }//ledOff() END
 		  
-		  // Hozzáadjuk az új értéket a charthoz
-			const now = new Date().toLocaleTimeString();
-			adcChart.data.labels.push(now);
-			adcChart.data.datasets[0].data.push(adcval['value']);
+		  async function getAdc() { //Na most jöhet a HTTP_GET.
+		    let url = "/getAdc"; //végpont megadása
+			//HTTP_GET metódus kiadása. Lényegében ugyan az a történet mint a korábbinál.
+		    let responseStored = await fetch(url).catch(err => { alert(err); })
+		    let text = await responseStored.text(); //A kapott responseStored-nak a body részét szövegesen string-be kiolvassa.
+		    let adcval = JSON.parse(text) //Itt átalakítja JSON formátumúvá.
+		    document.getElementById("state").value = adcval['value']; //Itt pedig a "state" id-val rendelkező elemnek az értékébe (mezőjébe) kiíratja ezt az értéket. 
+		  
+		    // Hozzáadjuk az új értéket a charthoz
+			const now = new Date().toLocaleTimeString(); //Létrehoz egy konstanst, amelybe a jelenlegi időt tárolja HH:MM:SS formátumban.
+			motorChart.data.labels.push(now);//Itt beletolja a chart-unk data-jának a labels részébe, azaz az x-tengelyébe ezt a idő értéket.
+			motorChart.data.datasets[0].data.push(adcval['value']); //Itt a kiolvasott értéket adjuk hozzá az y-tengelyhez tartozó érték tömbhöz.
 
 			// Ha túl sok adat van, törlünk a legelejéről
-			if (adcChart.data.labels.length > 20) {
-			  adcChart.data.labels.shift();
-			  adcChart.data.datasets[0].data.shift();
+			if (motorChart.data.labels.length > 20) {
+			  motorChart.data.labels.shift();
+			  motorChart.data.datasets[0].data.shift();
 			}
-
-			adcChart.update();
-		  
-		  
-		  
-		  }
+			motorChart.update(); //Ez frissíti a chart-ot, azaz beolvassa újra az értékeit és ezáltal újra rajzolja.	  
+		  }//getAdc() END
 			
 			// Chart inicializálása
 			const chartVar = document.getElementById('MyChart').getContext('2d');

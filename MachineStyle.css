@@ -85,6 +85,11 @@
 				
 			}
 			
+			.chartMachine {
+				background-color: rgba(40, 40, 40, 0.8);
+				
+			}
+			
 			/* fekete-fehér szegély */
 			.BW-border-outside {
 				display: inline-block;
