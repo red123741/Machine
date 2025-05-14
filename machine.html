@@ -20,13 +20,14 @@
 			<p class="text textborder text-box">Imáid továbbítva lettek,<br>de ez még nem jelent semmit!</p>
 		</div>
 		
-		<div style="display: flex;
-					justify-content: space-between;		
+		<!-- Fő div -->
+		<div style="width: 100%;
+					margin: 0 auto;
 					margin-top: 50px;
-					
-					height: 500px;
 					max-height: 100vh;">
-			<div 	style="	width:49%;
+			<!-- LED gombok div -->
+			<div 	style="	width: auto;
+							height: auto;
 							margin: 10px;
 							display: flex;
 							justify-content: space-between;"
@@ -44,19 +45,70 @@
 									>Turn<br>OFF LED
 						</button>
 			</div>
-			<div 	style="	width:49%;
-							margin: 10px;"
+			
+			<!-- chartos div -->
+			<div 	style="	width: 100%;
+							margin: 10px;
+							display: flex;
+							flex-wrap: wrap;
+							justify-content: space-between;"
+							
 					class="div-background">
-				<canvas id="MyChart" 
-						heigth="1000" 
+				<!-- Chart rész -->
+				<div style="flex: 0.9;
+							min-width: 0;">
+					<canvas id="MyChart" 
+						height="500" 
 						width="1000"
 						class="chartMachine"
 						style="	width: 100%;
-								height: 100%;
-								max-height: 100vh;
+								height: 500px;
+								max-height: 1000px;
+								margin: 20px;
 								"
 							>
-				</canvas>
+					</canvas>
+				</div>
+				<!-- chart gomb rész -->
+				<div style="flex: 0.1;
+							min-width: 120px;
+							margin: 20px;">
+					<button class="button middle spacing"
+							style=""
+							onclick=""
+								>Gyorsulás
+					</button>
+					<button class="button middle spacing"
+							style=""
+							onclick=""
+								>Sebesség
+						</button>
+					<button class="button middle spacing"
+							style=""
+							onclick=""
+								>Pozíció
+						</button>
+				</div>
+				<!-- enter div -->
+				<div style="flex-basis: 100%"> </div>
+				<!-- Motor vezérlő gombok -->
+				<div>
+					<button class="buttonBig"
+							style="	margin: 50px;"
+							onclick="motorFWD()"
+								>MOTOR ELŐRE
+					</button>
+					<button class="buttonBig"
+							style="	margin: 50px;"
+							onclick="motorRWD()"
+								>MOTOR HÁTRA
+					</button>
+					<p class="text middle">PWM érték beállítása: </p>
+					<br>
+					<input class="middle" type="range" id="motorPWM" min="0" max="100" value="50">
+				</div>
+				
+				
 			</div>
 		</div>
 		
@@ -119,6 +171,55 @@
 			  document.getElementById("feedback").value = "LED is already turned OFF";
 		  }//ledOff() END
 		  
+		  async function motorFWD() {
+			let pwmInput = document.getElementById("motorPWM");
+			let bodyjson = "{\"motorCode\":\"FWD\", \"motorPWM\":\"" + pwmInput + "\"}";
+			let url = "/motor"
+			
+			let responseStored = await fetch(url, {
+				method: 'POST',
+				body: bodyjson,
+				headers: {
+				'Access-Control-Allow-Headers': '*',
+				'Access-Control-Allow-Origin': '*',
+				'Content-type': 'application/json; charset=UTF-8'
+			  }
+			}).catch(err => { alert(err); });
+			
+			let ret = await responseStored.text();
+			let ret_json = JSON.parse(ret);
+			
+			if (ret_json['success'] === 1)
+			  console.log("Motor control was successful!");
+			else
+			  console.log("Motor control was not successful!");
+			
+		  }
+		  
+		  async function motorRWD() {
+			let pwmInput = document.getElementById("motorPWM");
+			let bodyjson = "{\"motorCode\":\"RWD\", \"motorPWM\":\"" + pwmInput + "\"}";
+			let url = "/motor"
+			
+			let responseStored = await fetch(url, {
+				method: 'POST',
+				body: bodyjson,
+				headers: {
+				'Access-Control-Allow-Headers': '*',
+				'Access-Control-Allow-Origin': '*',
+				'Content-type': 'application/json; charset=UTF-8'
+			  }
+			}).catch(err => { alert(err); });
+			
+			let ret = await responseStored.text();
+			let ret_json = JSON.parse(ret);
+			
+			if (ret_json['success'] === 1)
+			  console.log("Motor control was successful!");
+			else
+			  console.log("Motor control was not successful!");
+		  }
+		  
 		  async function getAdc() { //Na most jöhet a HTTP_GET.
 		    let url = "/getAdc"; //végpont megadása
 			//HTTP_GET metódus kiadása. Lényegében ugyan az a történet mint a korábbinál.
@@ -145,10 +246,10 @@
 			const motorChart = new Chart(chartVar, {
 			  type: 'line',
 			  data: {
-				labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+				labels: [1, 2, 3],
 				datasets: [{
 				  label: 'Motor position',
-				  data: [500, 750, 1000, 1250, 1500, 2000, 3000, 3500, 3750, 4000],
+				  data: [100, 200, 300],
 				  borderColor: 'rgba(96, 0, 0, 1)',
 				  backgroundColor: 'rgba(144, 0, 0, 1)',
 				  fill: false,
@@ -156,7 +257,7 @@
 				}]
 			  },
 			  options: {
-				responsive: true,
+				responsive: false,
 				animation: false,
 				scales: {
 				  x: {
