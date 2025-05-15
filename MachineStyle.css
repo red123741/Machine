@@ -5,17 +5,22 @@
 			body {
 				height: auto;
 				width: auto;
-				background: linear-gradient(135deg, #222, #222);
+				background: linear-gradient(135deg, #999, #222);
+			}
+			
+			.borderline {
+				border: 10px solid black;
+				
 			}
 			
 			.text {
 				display: block;				
-				color: #f00;
+				color: #800;
 				font-weight: bold;
 				text-align: center;
 				font-family: tahoma;
 				text-decoration: none;
-				font-size: clamp(10px, 2vw, 30px)
+				font-size: clamp(10px, 2vw, 20px)
 			}
 				
 			.shadow {
@@ -40,12 +45,12 @@
 				display: inline-block;
 				margin: 0 auto;
 				padding: 10px;
-				background-color: rgba(200, 200, 200, 0.9);
+				background-color: rgba(50, 50, 50, 0.6);
 				border-radius: 10px;
 			}
 			
 			.div-background {
-				background-color: rgba(200, 200, 200, 0.9);
+				background-color: rgba(50, 50, 50, 0.6);
 				border-radius: 20px;
 				
 			}
@@ -54,35 +59,44 @@
 				display: inline-block;
 				text-shadow:
 							2px 2px black;
-				color: #A00;
+				color: #800;
 				font-weight: bold;
 				text-align: center;
 				font-family: tahoma;
 				width: auto;
 				background-color: black;
-				box-shadow: 0 0 5px 5px #CCC;
-				border: 2px solid grey;
+				border: 2px solid #888;
 				border-radius: 5px;
+				padding: 10px;
+				font-size: clamp(5px, 10vw, 16px);
+				transition: .5s;
 			}
 			
 			.buttonBig {
 				display: inline-block;
 				text-shadow:
 							2px 2px black;
-				color: #A00;
+				color: #800;
 				font-weight: bold;
 				text-align: center;
 				font-family: tahoma;
 				max-width: 50%;
 				background-color: black;
-				box-shadow: 0 0 5px 5px #CCC;
 				border: 2px solid grey;
 				border-radius: 5px;
-				width: 350px;
+				width: 100px;
 				height: 100px;
-				font-size: clamp(5px, 10vw, 30px);
+				padding: 10px 0px;
+				font-size: clamp(5px, 10vw, 20px);
 				margin: 30px;
+				transition: .5s;
 				
+			}
+			
+			.buttonBig:hover, .button:hover {
+				background-color: #444;
+				color: #f00;
+				cursor: pointer;
 			}
 			
 			.chartMachine {
@@ -120,7 +134,8 @@
 			}
 			
 			.spacing {
-				margin-top: 100px;
+				margin-top: 90px;
+				margin-bottom: 90px;
 				
 			}
 			
@@ -129,3 +144,55 @@
 			}
 			
 			
+			/*PWM csúszka formázása*/
+			.slideContainer {
+				width: 50%;
+			}
+			
+			.slider {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 90%;
+				height: 50px;
+				background: #222;
+				border: 2px solid black;
+				border-radius: 10px;
+				outline: none;
+				opacity: 1;
+				-wbkit-transition: 10s;
+				transition: 10s;
+			}
+			
+			.slider:hover {
+				background: #600;
+			}
+			
+			.slider::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 50px;
+				height: 50px;
+				border-radius: 10px;
+				border: 5px solid #400;
+				background: #800;
+				cursor: pointer;
+				-wbkit-transition: 1s;
+				transition: 1s;
+			}
+			
+			.slider::-moz-range-thumb {
+				width: 50px;
+				height: 50px;
+				border-radius: 10px;
+				border: 5px solid #400;
+				background: #800;
+				cursor: pointer;
+				-wbkit-transition: 1s;
+				transition: 1s;
+			}
+			
+			
+			
+			.slider::-webkit-slider-thumb:hover {
+				background: #D00;	
+			}
