@@ -3,6 +3,7 @@
 		<meta charset="UTF-8">
 		<title>machine</title>
 		<link rel="icon" type="image/png" href="Image/icon.png">
+		 <!--<link rel="stylesheet" href="https://red123741.github.io/Machine/MachineStyle.css">	-->
 		<link rel="stylesheet" href="MachineStyle.css">
 		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 		<style>
@@ -12,7 +13,7 @@
 	<body>
 		<h1 class="text shadow"
 			style="	text-transform: uppercase;
-					font-size: clamp(10px, 5vw, 60px);
+					font-size: clamp(10px, 5vw, 40px);
 					">
 			Üdvözöllek a motor irányító központban
 		</h1>
@@ -28,7 +29,7 @@
 			<!-- LED gombok div -->
 			<div 	style="	width: auto;
 							height: auto;
-							margin: 10px;
+							margin: 0 auto;
 							display: flex;
 							justify-content: space-between;"
 					class="div-background">
@@ -38,6 +39,14 @@
 								onclick="ledOn()"
 									>Turn<br>ON LED
 						</button>
+						<div 	class="middle"
+								style="	flex:0.1;
+										margin: 20px;
+										background-color: #222;
+										border: 5px solid black;
+										border-radius: 15px;"
+								id="ledLamp">
+						</div>
 						<button class="buttonBig"
 								style="	flex:0.45;
 										"
@@ -48,7 +57,7 @@
 			
 			<!-- chartos div -->
 			<div 	style="	width: 100%;
-							margin: 10px;
+							margin-top: 20px;
 							display: flex;
 							flex-wrap: wrap;
 							justify-content: space-between;"
@@ -56,15 +65,18 @@
 					class="div-background">
 				<!-- Chart rész -->
 				<div style="flex: 0.9;
-							min-width: 0;">
+							min-width: 0;
+							background: linear-gradient(135deg, #600, #ab6d6d);
+							padding: 10px;
+							border-radius: 20px;">
 					<canvas id="MyChart" 
-						height="500" 
+						height="333" 
 						width="1000"
 						class="chartMachine"
 						style="	width: 100%;
-								height: 500px;
+								height: 100%;
 								max-height: 1000px;
-								margin: 20px;
+								margin: 0 auto;
 								"
 							>
 					</canvas>
@@ -92,20 +104,60 @@
 				<!-- enter div -->
 				<div style="flex-basis: 100%"> </div>
 				<!-- Motor vezérlő gombok -->
-				<div>
-					<button class="buttonBig"
-							style="	margin: 50px;"
+				<div 	class="middle " 
+						style="	display: flex;
+								width: 100%;
+								margin-top: 20px;
+								justify-content: space-between;">
+					<!-- motor irány -->
+					<div 	class=""
+							style="	flex:1;
+									display:flex;
+									align-items: center">
+									
+						<button class="buttonBig"
+							style="	margin: 10px;
+									flex: 0.5;"
 							onclick="motorFWD()"
 								>MOTOR ELŐRE
-					</button>
-					<button class="buttonBig"
-							style="	margin: 50px;"
-							onclick="motorRWD()"
-								>MOTOR HÁTRA
-					</button>
-					<p class="text middle">PWM érték beállítása: </p>
-					<br>
-					<input class="middle" type="range" id="motorPWM" min="0" max="100" value="50">
+						</button>
+						<button class="buttonBig"
+								style="	margin: 10px;
+									flex: 0.5;"
+								onclick="motorRWD()"
+									>MOTOR HÁTRA
+						</button>
+					</div>
+					<!-- motor sebesség -->
+					<div 	style="	flex:1;">
+					
+						<p class="text middle">PWM érték beállítása: </p>
+						<br>
+						<div class="sliderContainer middle">
+							<input  style="	margin-top: 20px;
+											margin-bottom: 0px;
+											"
+									class="slider" 
+									type="range" 
+									id="motorPWM" 
+									min="0" 
+									max="100" 
+									value="50">
+						</div>
+						<br>
+						<p 	class="text middle" 
+							style="	/*display: inline-block;*/
+									width: 50px;
+									height: auto;
+									border-radius: 5px;
+									border: 5px solid black;
+									margin-bottom: 10px;
+									padding: 5px;"
+							id="pwmout">
+								50
+						</p>
+					</div>
+					
 				</div>
 				
 				
@@ -120,10 +172,17 @@
 		  let ip = window.location.hostname; //A böngésződben megnyitott ablak url címéből kiszedi az IP cím részt, amelyet később felhasználhatsz.
 		  console.log("Az esp32 IP-címe:", ip); //Kírja a konzolba, amelyet F12-vel tudsz elérni.
 		  
+		  let pwmInput = document.getElementById("motorPWM");
+		  let output = document.getElementById("pwmout");
+		  
+		  pwmInput.addEventListener("input", function() {
+			output.textContent = pwmInput.value;
+		  });
+		  
 		  async function ledOn() { //Ha ez megvan akkor a ledOff-ot nem is kell majd részletezni.
 			let bodyjson = "{\"code\":\"107\"}"; //Létrehoz egy JSON objektumot "code" kulcsszóval és 107-es értéket rendel hozzá.
 			let url = "/ledOn"; //Létrehoz egy stringet "/ledOn" névvel, amely majd a végpont lesz.
-
+			
 			let responseStored = await fetch(url, { //Létrehoz egy response-t, amely a fetch response válaszát fogja tárolni. Amíg még nem érkezik válasz addig a fetch promise objektumot ad vissza, de az await segítségével megvárjuk, hogy befejezze a dolgát és így a végén már a fetch Response-t objektumot ad vissza.
 			  //Mi az a promise? A promise egy olyan objektum, amely visszaadja az adott dolognak az állapotát. 3 állapota lehet: pending (azaz még tart a folyamat), fulfilled (sikeresen megtörtént), rejected (hibára futott). Ez már egy komplexebb verziója annak amit a arduinos programokban láthattunk ahol csak egy bool értéket ad vissza.
 			  //Mivel a fetch egy aszinkron folyamat, azaz nem a megszokott arduinos formátumú, hogy ha megvan hívva egy függvény, akkor az végig fut és utána megy tovább a program, hanem meghívása után fut tovább a program. Hogy bevárjuk ezt a függvényt ezért egy await-et teszünk elé, amely addig megállítja a programot amíg benem fejezi.
@@ -143,9 +202,9 @@
 
 			if (ret_json['success'] === 1) //Mivel itt az esp oldalról már csak a success-t küldtük vissza így ennek értékét tudjuk leellenőrizni.
 			  //végre egy ismerős if szerkezet. -/\-
-			  document.getElementById("feedback").value = "LED has been turned ON";
+			  document.getElementById("ledLamp").style.background = "#00F";
 			else
-			  document.getElementById("feedback").value = "LED is already turned ON";
+			  document.getElementById("ledLamp").style.background = "#00B";
 		  }//ledOn() END
 		  
 		  async function ledOff() { //Ha megértetted az előzőt akkor megfejtheted magadtól a most következőt.
@@ -166,13 +225,13 @@
 			let ret_json = JSON.parse(ret);
 
 			if (ret_json['success'] === 1)
-			  document.getElementById("feedback").value = "LED has been turned OFF";
+			  document.getElementById("ledLamp").style.background = "#333";
 			else
-			  document.getElementById("feedback").value = "LED is already turned OFF";
+			  document.getElementById("ledLamp").style.background = "#000";
 		  }//ledOff() END
 		  
 		  async function motorFWD() {
-			let pwmInput = document.getElementById("motorPWM");
+			
 			let bodyjson = "{\"motorCode\":\"FWD\", \"motorPWM\":\"" + pwmInput + "\"}";
 			let url = "/motor"
 			
@@ -250,8 +309,8 @@
 				datasets: [{
 				  label: 'Motor position',
 				  data: [100, 200, 300],
-				  borderColor: 'rgba(96, 0, 0, 1)',
-				  backgroundColor: 'rgba(144, 0, 0, 1)',
+				  borderColor: 'rgba(180, 0, 0, 1)',
+				  backgroundColor: 'rgba(220, 0, 0, 1)',
 				  fill: false,
 				  tension: 0,
 				}]
